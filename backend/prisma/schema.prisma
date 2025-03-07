@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int          @id @default(autoincrement())
+  username      String
+  email     String       @unique
+  password  String
+  followedTeams   Team[]
+  followedCompetitions Competition[]
+  createdAt DateTime     @default(now())
+}
+
+model Team {
+  id        String      @id // API id
+  name      String
+  shortName  String
+  city      String
+  country   String
+  managerName String
+  stadiumId String
+  logo      String?
+  jerseys  Jersey[]
+  stadium   Stadium  @relation(fields: [stadiumId], references: [id])
+  players   Player[]
+  competitions Competition[]
+  standings    Standings[]
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+  users User[]
+}
+
+
+model Match {
+  id            String        @id //sport_event id
+  competitionId String     
+  homeTeamId    String         
+  awayTeamId    String         
+  homeTeam      Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam      Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  start_time          DateTime    
+  scoreHome     Int?        
+  scoreAway     Int?        
+  status        String      
+  round        Int
+  stadiumId    String
+
+  stadium      Stadium     @relation(fields: [stadiumId], references: [id])         
+  competition   Competition @relation(fields: [competitionId], references: [id])
+
+  @@unique([competitionId, homeTeamId, awayTeamId, start_time]) // Ensures no duplicate matches
+}
+
+model Stadium {
+  id        String   @id // API id
+  name      String
+  city      String
+  country   String
+  capacity  Int
+  teams     Team[]
+  matches   Match[]
+}
+
+model Player {
+  id        String      @id // API id
+  name      String?
+  teamId    String
+  position  String?
+  number    Int?
+  country   String?
+
+
+  team     Team        @relation(fields: [teamId], references: [id])
+  @@unique([id, teamId])
+}
+
+
+model Competition {
+  id        String      @id // usamos el seasonId de la API 
+  name      String
+  country   String
+  standings  Standings[]
+  logo     String?
+
+  matches   Match[]
+  Team Team[]
+  users User[]
+}
+
+model Jersey {
+  id        Int          @id @default(autoincrement())
+  teamId    String
+  type      String?
+  baseColor String?
+  sleeveColor String?
+  numberColor String?
+
+  team      Team        @relation(fields: [teamId], references: [id])
+  @@unique([teamId, type])
+}
+
+
+model Standings {
+  id            Int     @id @default(autoincrement())
+  competitionId String     
+  teamId        String
+  position      Int        
+  played        Int        
+  win           Int        
+  loss          Int        
+  draw          Int        
+  goals_for     Int        
+  goals_against Int        
+  points        Int        
+  form          String     
+  competition   Competition @relation(fields: [competitionId], references: [id])
+  team          Team        @relation(fields: [teamId], references: [id])
+
+  @@unique([competitionId, teamId]) 
+}
+

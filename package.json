@@ -1,0 +1,12 @@
+{
+  "name": "promiedos-app",
+  "private": true,
+  "scripts": {
+    "dev:frontend": "pnpm --filter frontend start",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev": "concurrently --raw -n \"frontend,backend\" -c \"blue,green\" \"pnpm run dev:frontend\" \"pnpm run dev:backend\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
