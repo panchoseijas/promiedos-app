@@ -18,11 +18,11 @@ import { userStore } from "@/store/userStore";
 
 const HomeScreen = () => {
   const { colorScheme, toggleColorScheme } = useColorScheme();
-  const today = new Date();
+  const today = new Date("2024-11-11");
   const [dates, setDates] = useState(generateDates(today));
   const [modalVisible, setModalVisible] = useState(false);
   const [tabs, setTabs] = useState(dates.map((date) => formatDate(date)));
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(today);
   const animatedOpacity = useRef(new Animated.Value(0)).current;
   const { toggleThemePreferance } = userStore();
 
